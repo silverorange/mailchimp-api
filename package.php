@@ -41,7 +41,7 @@ $package->setNotes($notes);
 
 $package->addIgnore('package.php');
 
-$package->addMaintainer('lead', 'isaacgrant', 'Isaac Grant', 'isaac@silverorange.com');
+$package->addMaintainer('lead', 'isaac', 'Isaac Grant', 'isaac@silverorange.com');
 
 $package->setPhpDep('5.1.5');
 $package->setPearinstallerDep('1.4.0');
