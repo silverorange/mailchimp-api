@@ -145,6 +145,7 @@ class MailChimpAPI {
         $serial = @unserialize($response);
         if($response && $serial === false) {
         	$response = array("error" => "Bad Response.  Got This: " . $response, "code" => "-99");
+            $errored = true;
         } else {
         	$response = $serial;
         }
