@@ -140,9 +140,7 @@ class MailChimpAPI {
 
         if(ini_get("magic_quotes_runtime")) $response = stripslashes($response);
 
-        // suppress unserialize E_NOTICES, which happen when MailChimp goes down
-        // and returns its service unavailable page.
-        $serial = @unserialize($response);
+        $serial = unserialize($response);
         if($response && $serial === false) {
         	$response = array("error" => "Bad Response.  Got This: " . $response, "code" => "-99");
             $errored = true;
