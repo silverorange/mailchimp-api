@@ -2,7 +2,7 @@
 
 require_once 'PEAR/PackageFileManager2.php';
 
-$version = '1.3.1so1';
+$version = '1.3.1so2';
 $notes = <<<EOT
 MailChimp API version 1.3.1
 EOT;
