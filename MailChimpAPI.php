@@ -100,9 +100,9 @@ class MailChimpAPI {
 
         ob_start();
         if ($this->secure){
-            $sock = fsockopen("ssl://".$host, 443, $errno, $errstr, 30);
+            $sock = fsockopen("ssl://".$host, 443, $errno, $errstr, $this->timeout);
         } else {
-            $sock = fsockopen($host, 80, $errno, $errstr, 30);
+            $sock = fsockopen($host, 80, $errno, $errstr, $this->timeout);
         }
         if(!$sock) {
             $this->errorMessage = "Could not connect (ERR $errno: $errstr)";
