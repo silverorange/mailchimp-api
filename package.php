@@ -2,9 +2,9 @@
 
 require_once 'PEAR/PackageFileManager2.php';
 
-$version = '1.3.1so3';
+$version = '1.3.2so1';
 $notes = <<<EOT
-MailChimp API version 1.3.1
+MailChimp API version 1.3.2
 EOT;
 
 $description =<<<EOT
@@ -35,7 +35,7 @@ $package->setLicense('LGPL', 'http://www.gnu.org/copyleft/lesser.html');
 
 $package->setReleaseVersion($version);
 $package->setReleaseStability('stable');
-$package->setAPIVersion('1.3.1');
+$package->setAPIVersion('1.3.2');
 $package->setAPIStability('stable');
 $package->setNotes($notes);
 
