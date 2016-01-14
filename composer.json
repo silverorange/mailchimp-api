@@ -2,7 +2,7 @@
 	"name": "silverorange/mailchimp_api",
 	"description": "MailChimp 1.x API wrapper.",
 	"type": "library",
-	"keywords": [ "bitsontherun" ],
+	"keywords": [ "mailchimp", "email", "campaign" ],
 	"homepage": "https://github.com/silverorange/mailchimp-api",
 	"license": "MIT",
 	"authors": [
