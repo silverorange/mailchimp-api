@@ -2,7 +2,7 @@
 
 require_once 'PEAR/PackageFileManager2.php';
 
-$version = '1.3.2so1';
+$version = '1.3.2so2';
 $notes = <<<EOT
 MailChimp API version 1.3.2
 EOT;
@@ -16,7 +16,7 @@ PEAR::setErrorHandling(PEAR_ERROR_DIE);
 
 $package->setOptions(
 	array(
-		'filelistgenerator' => 'svn',
+		'filelistgenerator' => 'file',
 		'simpleoutput'      => true,
 		'baseinstalldir'    => '/',
 		'packagedirectory'  => './',
