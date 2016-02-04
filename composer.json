@@ -22,5 +22,8 @@
 		"psr-0": {
 			"MailChimpAPI" : ""
 		}
-	}
+	},
+	"include-path": [
+		"./"
+	]
 }
