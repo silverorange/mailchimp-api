@@ -1,34 +1,34 @@
 <?php
 
 class MailChimpAPI {
-    var $version = "1.3";
-    var $errorMessage;
-    var $errorCode;
+    public $version = "1.3";
+    public $errorMessage;
+    public $errorCode;
 
     /**
      * Cache the information on the API location on the server
      */
-    var $apiUrl;
+    protected $apiUrl;
 
     /**
      * Default to a 300 second timeout on server calls
      */
-    var $timeout = 300;
+    protected $timeout = 300;
 
     /**
      * Default to a 8K chunk size
      */
-    var $chunkSize = 8192;
+    public $chunkSize = 8192;
 
     /**
      * Cache the user api_key so we only have to log in once per client instantiation
      */
-    var $api_key;
+    protected $api_key;
 
     /**
      * Cache the user api_key so we only have to log in once per client instantiation
      */
-    var $secure = false;
+    protected $secure = false;
 
     /**
      * Connect to the MailChimp API for a given list.
@@ -36,21 +36,21 @@ class MailChimpAPI {
      * @param string $apikey Your MailChimp apikey
      * @param string $secure Whether or not this should use a secure connection
      */
-    function MailChimpAPI($apikey, $secure=false) {
+    public function __construct($apikey, $secure=false) {
         $this->secure = $secure;
         $this->apiUrl = parse_url("http://api.mailchimp.com/" . $this->version . "/?output=php");
         $this->api_key = $apikey;
     }
-    function setTimeout($seconds){
+    public function setTimeout($seconds){
         if (is_int($seconds)){
             $this->timeout = $seconds;
             return true;
         }
     }
-    function getTimeout(){
+    public function getTimeout(){
         return $this->timeout;
     }
-    function useSecure($val){
+    public function useSecure($val){
         if ($val===true){
             $this->secure = true;
         } else {
@@ -62,7 +62,7 @@ class MailChimpAPI {
      * Actually connect to the server and call the requested methods, parsing the result
      * You should never have to call this function manually
      */
-    function __call($method, $params) {
+    public function __call($method, $params) {
 	    $dc = "us1";
 	    if (strstr($this->api_key,"-")){
         	list($key, $dc) = explode("-",$this->api_key,2);
