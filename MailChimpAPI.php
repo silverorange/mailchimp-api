@@ -1,6 +1,7 @@
 <?php
 
-class MailChimpAPI {
+class MailChimpAPI
+{
     public $version = "1.3";
     public $errorMessage;
     public $errorCode;
@@ -36,21 +37,28 @@ class MailChimpAPI {
      * @param string $apikey Your MailChimp apikey
      * @param string $secure Whether or not this should use a secure connection
      */
-    public function __construct($apikey, $secure=false) {
+    public function __construct($apikey, $secure=false)
+    {
         $this->secure = $secure;
         $this->apiUrl = parse_url("http://api.mailchimp.com/" . $this->version . "/?output=php");
         $this->api_key = $apikey;
     }
-    public function setTimeout($seconds){
+
+    public function setTimeout($seconds)
+    {
         if (is_int($seconds)){
             $this->timeout = $seconds;
             return true;
         }
     }
-    public function getTimeout(){
+
+    public function getTimeout()
+    {
         return $this->timeout;
     }
-    public function useSecure($val){
+
+    public function useSecure($val)
+    {
         if ($val===true){
             $this->secure = true;
         } else {
@@ -62,10 +70,11 @@ class MailChimpAPI {
      * Actually connect to the server and call the requested methods, parsing the result
      * You should never have to call this function manually
      */
-    public function __call($method, $params) {
-	    $dc = "us1";
-	    if (strstr($this->api_key,"-")){
-        	list($key, $dc) = explode("-",$this->api_key,2);
+    public function __call($method, $params)
+    {
+        $dc = "us1";
+        if (strstr($this->api_key,"-")){
+            list($key, $dc) = explode("-",$this->api_key,2);
             if (!$dc) $dc = "us1";
         }
         $host = $dc.".".$this->apiUrl["host"];
@@ -81,7 +90,7 @@ class MailChimpAPI {
         }
         //mutate params
         $mutate = array();
-		$mutate["apikey"] = $this->api_key;
+        $mutate["apikey"] = $this->api_key;
         foreach($params as $k=>$v){
             $mutate[$this->function_map[$method][$k]] = $v;
         }
@@ -142,10 +151,10 @@ class MailChimpAPI {
 
         $serial = unserialize($response);
         if($response && $serial === false) {
-        	$response = array("error" => "Bad Response.  Got This: " . $response, "code" => "-99");
+            $response = array("error" => "Bad Response.  Got This: " . $response, "code" => "-99");
             $errored = true;
         } else {
-        	$response = $serial;
+            $response = $serial;
         }
         if($errored && is_array($response) && isset($response["error"])) {
             $this->errorMessage = $response["error"];
@@ -160,112 +169,113 @@ class MailChimpAPI {
         return $response;
     }
 
-    protected $function_map = array('campaignUnschedule'=>array("cid"),
-'campaignSchedule'=>array("cid","schedule_time","schedule_time_b"),
-'campaignScheduleBatch'=>array("cid","schedule_time","num_batches","stagger_mins"),
-'campaignResume'=>array("cid"),
-'campaignPause'=>array("cid"),
-'campaignSendNow'=>array("cid"),
-'campaignSendTest'=>array("cid","test_emails","send_type"),
-'campaignSegmentTest'=>array("list_id","options"),
-'campaignCreate'=>array("type","options","content","segment_opts","type_opts"),
-'campaignUpdate'=>array("cid","name","value"),
-'campaignReplicate'=>array("cid"),
-'campaignDelete'=>array("cid"),
-'campaigns'=>array("filters","start","limit"),
-'campaignStats'=>array("cid"),
-'campaignClickStats'=>array("cid"),
-'campaignEmailDomainPerformance'=>array("cid"),
-'campaignMembers'=>array("cid","status","start","limit"),
-'campaignHardBounces'=>array("cid","start","limit"),
-'campaignSoftBounces'=>array("cid","start","limit"),
-'campaignUnsubscribes'=>array("cid","start","limit"),
-'campaignAbuseReports'=>array("cid","since","start","limit"),
-'campaignAdvice'=>array("cid"),
-'campaignAnalytics'=>array("cid"),
-'campaignGeoOpens'=>array("cid"),
-'campaignGeoOpensForCountry'=>array("cid","code"),
-'campaignEepUrlStats'=>array("cid"),
-'campaignBounceMessage'=>array("cid","email"),
-'campaignBounceMessages'=>array("cid","start","limit","since"),
-'campaignEcommOrders'=>array("cid","start","limit","since"),
-'campaignShareReport'=>array("cid","opts"),
-'campaignContent'=>array("cid","for_archive"),
-'campaignTemplateContent'=>array("cid"),
-'campaignOpenedAIM'=>array("cid","start","limit"),
-'campaignNotOpenedAIM'=>array("cid","start","limit"),
-'campaignClickDetailAIM'=>array("cid","url","start","limit"),
-'campaignEmailStatsAIM'=>array("cid","email_address"),
-'campaignEmailStatsAIMAll'=>array("cid","start","limit"),
-'campaignEcommOrderAdd'=>array("order"),
-'lists'=>array("filters","start","limit","sort_field","sort_dir"),
-'listMergeVars'=>array("id"),
-'listMergeVarAdd'=>array("id","tag","name","options"),
-'listMergeVarUpdate'=>array("id","tag","options"),
-'listMergeVarDel'=>array("id","tag"),
-'listMergeVarReset'=>array("id","tag"),
-'listInterestGroupings'=>array("id"),
-'listInterestGroupAdd'=>array("id","group_name","grouping_id"),
-'listInterestGroupDel'=>array("id","group_name","grouping_id"),
-'listInterestGroupUpdate'=>array("id","old_name","new_name","grouping_id"),
-'listInterestGroupingAdd'=>array("id","name","type","groups"),
-'listInterestGroupingUpdate'=>array("grouping_id","name","value"),
-'listInterestGroupingDel'=>array("grouping_id"),
-'listWebhooks'=>array("id"),
-'listWebhookAdd'=>array("id","url","actions","sources"),
-'listWebhookDel'=>array("id","url"),
-'listStaticSegments'=>array("id"),
-'listStaticSegmentAdd'=>array("id","name"),
-'listStaticSegmentReset'=>array("id","seg_id"),
-'listStaticSegmentDel'=>array("id","seg_id"),
-'listStaticSegmentMembersAdd'=>array("id","seg_id","batch"),
-'listStaticSegmentMembersDel'=>array("id","seg_id","batch"),
-'listSubscribe'=>array("id","email_address","merge_vars","email_type","double_optin","update_existing","replace_interests","send_welcome"),
-'listUnsubscribe'=>array("id","email_address","delete_member","send_goodbye","send_notify"),
-'listUpdateMember'=>array("id","email_address","merge_vars","email_type","replace_interests"),
-'listBatchSubscribe'=>array("id","batch","double_optin","update_existing","replace_interests"),
-'listBatchUnsubscribe'=>array("id","emails","delete_member","send_goodbye","send_notify"),
-'listMembers'=>array("id","status","since","start","limit","sort_dir"),
-'listMemberInfo'=>array("id","email_address"),
-'listMemberActivity'=>array("id","email_address"),
-'listAbuseReports'=>array("id","start","limit","since"),
-'listGrowthHistory'=>array("id"),
-'listActivity'=>array("id"),
-'listLocations'=>array("id"),
-'listClients'=>array("id"),
-'templates'=>array("types","category","inactives"),
-'templateInfo'=>array("tid","type"),
-'templateAdd'=>array("name","html"),
-'templateUpdate'=>array("id","values"),
-'templateDel'=>array("id"),
-'templateUndel'=>array("id"),
-'getAccountDetails'=>array("exclude"),
-'getVerifiedDomains'=>array(),
-'generateText'=>array("type","content"),
-'inlineCss'=>array("html","strip_css"),
-'folders'=>array("type"),
-'folderAdd'=>array("name","type"),
-'folderUpdate'=>array("fid","name","type"),
-'folderDel'=>array("fid","type"),
-'ecommOrders'=>array("start","limit","since"),
-'ecommOrderAdd'=>array("order"),
-'ecommOrderDel'=>array("store_id","order_id"),
-'listsForEmail'=>array("email_address"),
-'campaignsForEmail'=>array("email_address","options"),
-'chimpChatter'=>array(),
-'searchMembers'=>array("query","id","offset"),
-'searchCampaigns'=>array("query","offset","snip_start","snip_end"),
-'apikeys'=>array("username","password","expired"),
-'apikeyAdd'=>array("username","password"),
-'apikeyExpire'=>array("username","password"),
-'ping'=>array(),
-'deviceRegister'=>array("mobile_key","details"),
-'deviceUnregister'=>array("mobile_key","device_id"),
-'gmonkeyAdd'=>array("id","email_address"),
-'gmonkeyDel'=>array("id","email_address"),
-'gmonkeyMembers'=>array(),
-'gmonkeyActivity'=>array());
-
+    protected $function_map = array(
+        'campaignUnschedule'=>array("cid"),
+        'campaignSchedule'=>array("cid","schedule_time","schedule_time_b"),
+        'campaignScheduleBatch'=>array("cid","schedule_time","num_batches","stagger_mins"),
+        'campaignResume'=>array("cid"),
+        'campaignPause'=>array("cid"),
+        'campaignSendNow'=>array("cid"),
+        'campaignSendTest'=>array("cid","test_emails","send_type"),
+        'campaignSegmentTest'=>array("list_id","options"),
+        'campaignCreate'=>array("type","options","content","segment_opts","type_opts"),
+        'campaignUpdate'=>array("cid","name","value"),
+        'campaignReplicate'=>array("cid"),
+        'campaignDelete'=>array("cid"),
+        'campaigns'=>array("filters","start","limit"),
+        'campaignStats'=>array("cid"),
+        'campaignClickStats'=>array("cid"),
+        'campaignEmailDomainPerformance'=>array("cid"),
+        'campaignMembers'=>array("cid","status","start","limit"),
+        'campaignHardBounces'=>array("cid","start","limit"),
+        'campaignSoftBounces'=>array("cid","start","limit"),
+        'campaignUnsubscribes'=>array("cid","start","limit"),
+        'campaignAbuseReports'=>array("cid","since","start","limit"),
+        'campaignAdvice'=>array("cid"),
+        'campaignAnalytics'=>array("cid"),
+        'campaignGeoOpens'=>array("cid"),
+        'campaignGeoOpensForCountry'=>array("cid","code"),
+        'campaignEepUrlStats'=>array("cid"),
+        'campaignBounceMessage'=>array("cid","email"),
+        'campaignBounceMessages'=>array("cid","start","limit","since"),
+        'campaignEcommOrders'=>array("cid","start","limit","since"),
+        'campaignShareReport'=>array("cid","opts"),
+        'campaignContent'=>array("cid","for_archive"),
+        'campaignTemplateContent'=>array("cid"),
+        'campaignOpenedAIM'=>array("cid","start","limit"),
+        'campaignNotOpenedAIM'=>array("cid","start","limit"),
+        'campaignClickDetailAIM'=>array("cid","url","start","limit"),
+        'campaignEmailStatsAIM'=>array("cid","email_address"),
+        'campaignEmailStatsAIMAll'=>array("cid","start","limit"),
+        'campaignEcommOrderAdd'=>array("order"),
+        'lists'=>array("filters","start","limit","sort_field","sort_dir"),
+        'listMergeVars'=>array("id"),
+        'listMergeVarAdd'=>array("id","tag","name","options"),
+        'listMergeVarUpdate'=>array("id","tag","options"),
+        'listMergeVarDel'=>array("id","tag"),
+        'listMergeVarReset'=>array("id","tag"),
+        'listInterestGroupings'=>array("id"),
+        'listInterestGroupAdd'=>array("id","group_name","grouping_id"),
+        'listInterestGroupDel'=>array("id","group_name","grouping_id"),
+        'listInterestGroupUpdate'=>array("id","old_name","new_name","grouping_id"),
+        'listInterestGroupingAdd'=>array("id","name","type","groups"),
+        'listInterestGroupingUpdate'=>array("grouping_id","name","value"),
+        'listInterestGroupingDel'=>array("grouping_id"),
+        'listWebhooks'=>array("id"),
+        'listWebhookAdd'=>array("id","url","actions","sources"),
+        'listWebhookDel'=>array("id","url"),
+        'listStaticSegments'=>array("id"),
+        'listStaticSegmentAdd'=>array("id","name"),
+        'listStaticSegmentReset'=>array("id","seg_id"),
+        'listStaticSegmentDel'=>array("id","seg_id"),
+        'listStaticSegmentMembersAdd'=>array("id","seg_id","batch"),
+        'listStaticSegmentMembersDel'=>array("id","seg_id","batch"),
+        'listSubscribe'=>array("id","email_address","merge_vars","email_type","double_optin","update_existing","replace_interests","send_welcome"),
+        'listUnsubscribe'=>array("id","email_address","delete_member","send_goodbye","send_notify"),
+        'listUpdateMember'=>array("id","email_address","merge_vars","email_type","replace_interests"),
+        'listBatchSubscribe'=>array("id","batch","double_optin","update_existing","replace_interests"),
+        'listBatchUnsubscribe'=>array("id","emails","delete_member","send_goodbye","send_notify"),
+        'listMembers'=>array("id","status","since","start","limit","sort_dir"),
+        'listMemberInfo'=>array("id","email_address"),
+        'listMemberActivity'=>array("id","email_address"),
+        'listAbuseReports'=>array("id","start","limit","since"),
+        'listGrowthHistory'=>array("id"),
+        'listActivity'=>array("id"),
+        'listLocations'=>array("id"),
+        'listClients'=>array("id"),
+        'templates'=>array("types","category","inactives"),
+        'templateInfo'=>array("tid","type"),
+        'templateAdd'=>array("name","html"),
+        'templateUpdate'=>array("id","values"),
+        'templateDel'=>array("id"),
+        'templateUndel'=>array("id"),
+        'getAccountDetails'=>array("exclude"),
+        'getVerifiedDomains'=>array(),
+        'generateText'=>array("type","content"),
+        'inlineCss'=>array("html","strip_css"),
+        'folders'=>array("type"),
+        'folderAdd'=>array("name","type"),
+        'folderUpdate'=>array("fid","name","type"),
+        'folderDel'=>array("fid","type"),
+        'ecommOrders'=>array("start","limit","since"),
+        'ecommOrderAdd'=>array("order"),
+        'ecommOrderDel'=>array("store_id","order_id"),
+        'listsForEmail'=>array("email_address"),
+        'campaignsForEmail'=>array("email_address","options"),
+        'chimpChatter'=>array(),
+        'searchMembers'=>array("query","id","offset"),
+        'searchCampaigns'=>array("query","offset","snip_start","snip_end"),
+        'apikeys'=>array("username","password","expired"),
+        'apikeyAdd'=>array("username","password"),
+        'apikeyExpire'=>array("username","password"),
+        'ping'=>array(),
+        'deviceRegister'=>array("mobile_key","details"),
+        'deviceUnregister'=>array("mobile_key","device_id"),
+        'gmonkeyAdd'=>array("id","email_address"),
+        'gmonkeyDel'=>array("id","email_address"),
+        'gmonkeyMembers'=>array(),
+        'gmonkeyActivity'=>array(),
+    );
 }
 
 ?>
