@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @package   MailChimpAPI
+ * @copyright 2008-2010 MailChimp, Inc.
+ * @license   http://www.opensource.org/licenses/mit-license.html MIT License
+ */
 class MailChimpAPI
 {
     public $version = "1.3";
@@ -46,7 +51,7 @@ class MailChimpAPI
 
     public function setTimeout($seconds)
     {
-        if (is_int($seconds)){
+        if (is_int($seconds)) {
             $this->timeout = $seconds;
             return true;
         }
@@ -59,7 +64,7 @@ class MailChimpAPI
 
     public function useSecure($val)
     {
-        if ($val===true){
+        if ($val === true) {
             $this->secure = true;
         } else {
             $this->secure = false;
@@ -73,8 +78,8 @@ class MailChimpAPI
     public function __call($method, $params)
     {
         $dc = "us1";
-        if (strstr($this->api_key,"-")){
-            list($key, $dc) = explode("-",$this->api_key,2);
+        if (strstr($this->api_key, "-")) {
+            list($key, $dc) = explode("-", $this->api_key, 2);
             if (!$dc) $dc = "us1";
         }
         $host = $dc.".".$this->apiUrl["host"];
@@ -82,20 +87,20 @@ class MailChimpAPI
         $this->errorMessage = "";
         $this->errorCode = "";
         $sep_changed = false;
-        //sigh, apparently some distribs change this to &amp; by default
-        if (ini_get("arg_separator.output")!="&"){
+        // sigh, apparently some distribs change this to &amp; by default
+        if (ini_get("arg_separator.output") != "&") {
             $sep_changed = true;
             $orig_sep = ini_get("arg_separator.output");
             ini_set("arg_separator.output", "&");
         }
-        //mutate params
+        // mutate params
         $mutate = array();
         $mutate["apikey"] = $this->api_key;
-        foreach($params as $k=>$v){
+        foreach ($params as $k => $v) {
             $mutate[$this->function_map[$method][$k]] = $v;
         }
         $post_vars = http_build_query($mutate);
-        if ($sep_changed){
+        if ($sep_changed) {
             ini_set("arg_separator.output", $orig_sep);
         }
 
@@ -108,12 +113,12 @@ class MailChimpAPI
         $payload .= $post_vars;
 
         ob_start();
-        if ($this->secure){
+        if ($this->secure) {
             $sock = fsockopen("ssl://".$host, 443, $errno, $errstr, $this->timeout);
         } else {
             $sock = fsockopen($host, 80, $errno, $errstr, $this->timeout);
         }
-        if(!$sock) {
+        if (!$sock) {
             $this->errorMessage = "Could not connect (ERR $errno: $errstr)";
             $this->errorCode = "-99";
             ob_end_clean();
@@ -139,10 +144,10 @@ class MailChimpAPI
         list($headers, $response) = explode("\r\n\r\n", $response, 2);
         $headers = explode("\r\n", $headers);
         $errored = false;
-        foreach($headers as $h){
-            if (substr($h,0,26)==="X-MailChimp-API-Error-Code"){
+        foreach ($headers as $h) {
+            if (substr($h, 0, 26) === "X-MailChimp-API-Error-Code") {
                 $errored = true;
-                $error_code = trim(substr($h,27));
+                $error_code = trim(substr($h, 27));
                 break;
             }
         }
@@ -150,17 +155,17 @@ class MailChimpAPI
         if(ini_get("magic_quotes_runtime")) $response = stripslashes($response);
 
         $serial = unserialize($response);
-        if($response && $serial === false) {
+        if ($response && $serial === false) {
             $response = array("error" => "Bad Response.  Got This: " . $response, "code" => "-99");
             $errored = true;
         } else {
             $response = $serial;
         }
-        if($errored && is_array($response) && isset($response["error"])) {
+        if ($errored && is_array($response) && isset($response["error"])) {
             $this->errorMessage = $response["error"];
             $this->errorCode = $response["code"];
             return false;
-        } elseif($errored){
+        } elseif ($errored) {
             $this->errorMessage = "No error message was found";
             $this->errorCode = $error_code;
             return false;
