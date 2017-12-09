@@ -78,7 +78,7 @@ class MailChimpAPI
     public function __call($method, $params)
     {
         $dc = "us1";
-        if (strstr($this->api_key, "-")) {
+        if (mb_strstr($this->api_key, '-') !== false) {
             list($key, $dc) = explode("-", $this->api_key, 2);
             if (!$dc) $dc = "us1";
         }
@@ -145,9 +145,9 @@ class MailChimpAPI
         $headers = explode("\r\n", $headers);
         $errored = false;
         foreach ($headers as $h) {
-            if (substr($h, 0, 26) === "X-MailChimp-API-Error-Code") {
+            if (mb_substr($h, 0, 26) === 'X-MailChimp-API-Error-Code') {
                 $errored = true;
-                $error_code = trim(substr($h, 27));
+                $error_code = trim(mb_substr($h, 27));
                 break;
             }
         }

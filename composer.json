@@ -16,7 +16,8 @@
     "source": "https://github.com/silverorange/mailchimp-api"
   },
   "require": {
-    "php": ">=5.1.5"
+    "php": ">=5.1.5",
+    "ext-mbstring": "*"
   },
   "require-dev": {
     "silverorange/coding-standard": "^0.6.0"
